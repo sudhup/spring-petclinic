@@ -18,7 +18,9 @@ package org.springframework.samples.petclinic;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-
+import io.prometheus.client.Counter;
+import io.prometheus.client.exporter.HTTPServer;
+import java.io.IOException;
 /**
  * PetClinic Spring Boot Application.
  *
@@ -27,8 +29,15 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  */
 @SpringBootApplication(proxyBeanMethods = false)
 public class PetClinicApplication {
-
+	static final Counter requests = Counter.build()
+     .name("requests_total").help("Total requests.").register();
 	public static void main(String[] args) {
+		try {
+            HTTPServer server = new HTTPServer(8080);
+        } catch (IOException e) {
+            System.out.println("Failed to start metrics endpoint.");
+            e.printStackTrace();
+        }
 		SpringApplication.run(PetClinicApplication.class, args);
 	}
 
